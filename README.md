@@ -91,11 +91,11 @@ Create a CSV file with your grade data. The file should include the following co
 - `units`: Credit units for the course
 - `class_title`: Full name of the course
 
-You can use `sample_grades.csv` as a template. The easiest way to do this is just put your unofficial transcript and my template into ChatGPT, and it will reformat it correctly.
+You can use `samplegrades.csv` as a template. The easiest way to do this is just put your unofficial transcript and my template into ChatGPT, and it will reformat it correctly.
 
 ### Run the Program
 
-To run the program with the default `grades.csv` file:
+To run the program with the default `samplegrades.csv` file:
 
 ```bash
 python main.py
