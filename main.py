@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Dict, Optional
 
 
-class GPAVisualizer:
+class GPAVisualiser:
     def __init__(self):
         self.grade_points = {
             'HD': 7,
@@ -244,20 +244,20 @@ class GPAVisualizer:
 
 
 def main():
-    visualizer = GPAVisualizer()
+    visualiser = GPAVisualiser()
 
     # Check if dan_grades.csv file exists and use it, otherwise use the built-in data
     try:
         print("Attempting to load data from dan_grades.csv...")
-        df = visualizer.load_from_csv('samplegrades.csv')
+        df = visualiser.load_from_csv('samplegrades.csv')
         print("Successfully loaded data from dan_grades.csv.")
     except (FileNotFoundError, ValueError) as e:
         print(f"Error loading CSV: {e}")
         print("Falling back to built-in data.")
-        df = visualizer.create_grade_data()
+        df = visualiser.create_grade_data()
 
     # Calculate GPA using university method
-    results = visualizer.calculate_university_gpa(df)
+    results = visualiser.calculate_university_gpa(df)
 
     # Print detailed analysis
     print("\nGPA Calculation Details")
@@ -279,13 +279,13 @@ def main():
     print(f"\nGPA: {results['gpa']}")
 
     # Generate visualizations
-    visualizer.plot_grade_distribution(df)
-    visualizer.plot_mark_distribution(df)
-    visualizer.plot_course_performance(df)
-    visualizer.plot_gpa_trend(df)
+    visualiser.plot_grade_distribution(df)
+    visualiser.plot_mark_distribution(df)
+    visualiser.plot_course_performance(df)
+    visualiser.plot_gpa_trend(df)
 
     # Print semester GPA information
-    semester_gpa_df = visualizer.calculate_semester_gpa(df)
+    semester_gpa_df = visualiser.calculate_semester_gpa(df)
     print("\nSemester GPA Breakdown:")
     print("-" * 40)
     print(f"{'Semester':<10} {'Units':>8} {'GPA':>8}")

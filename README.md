@@ -1,19 +1,19 @@
-# GPA Visualizer
+# GPA Visualiser
 
 A Python tool for visualising academic performance and calculating GPAs from CSV grade data, designed for the University of Newcastle GPA grading system: https://www.newcastle.edu.au/current-students/study-essentials/assessment-and-exams/results/gpa-calculator
 
 ## Features
 
 - 📊 Calculate overall GPA using a 7-point scale
-- 📈 Visualize GPA trends across semesters
+- 📈 Visualise GPA trends across semesters
 - 🥧 Generate grade distribution charts
-- 📉 Analyze mark distributions
+- 📉 Analyse mark distributions
 - 📋 View detailed course performance breakdowns
 
 ## Screenshots
 
 ### GPA Trend
-![GPA Trend Visualization](screenshots/gpa_trend.png)
+![GPA Trend Visualisation](screenshots/gpa_trend.png)
 
 ### Grade Distribution
 ![Grade Distribution](screenshots/grade_distribution.png)
@@ -37,8 +37,8 @@ A Python tool for visualising academic performance and calculating GPAs from CSV
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/gpa-visualizer.git
-cd gpa-visualizer
+git clone https://github.com/swazau/UON_GPA.git
+cd gpa-visualiser
 
 # Run the setup script
 setup.bat
@@ -48,8 +48,8 @@ setup.bat
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/gpa-visualizer.git
-cd gpa-visualizer
+git clone https://github.com/swazau/UON_GPA.git
+cd gpa-visualiser
 
 # Make the setup script executable
 chmod +x setup.sh
@@ -62,8 +62,8 @@ chmod +x setup.sh
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/gpa-visualizer.git
-cd gpa-visualizer
+git clone https://github.com/swazau/UON_GPA.git
+cd gpa-visualiser
 
 # Create a virtual environment
 python -m venv venv
@@ -111,7 +111,7 @@ python main.py your_grades_file.csv
 
 The program generates:
 1. Detailed GPA calculations in the console
-2. Four visualization files:
+2. Four visualisation files:
    - `grade_distribution.png`: Pie chart showing grade distribution by units
    - `mark_distribution.png`: Histogram of numerical marks
    - `course_performance.png`: Bar chart of performance by course
@@ -119,7 +119,7 @@ The program generates:
 
 ## Grade Scale
 
-This visualizer uses the following 7-point grade scale:
+This visualiser uses the following 7-point grade scale:
 
 | Grade | Points | Description        |
 |-------|---------|--------------------|
@@ -129,9 +129,9 @@ This visualizer uses the following 7-point grade scale:
 | P     | 4       | Pass               |
 | F     | 0       | Fail               |
 
-## Customization
+## Customisation
 
-You can modify the grade points in the `GPAVisualizer` class initialization if your institution uses a different scale.
+You can modify the grade points in the `GPAVisualiser` class initialisation if your institution uses a different scale.
 
 ## Contributing
 
@@ -144,4 +144,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Acknowledgments
 
 - [Pandas](https://pandas.pydata.org/) for data manipulation
-- [Matplotlib](https://matplotlib.org/) and [Seaborn](https://seaborn.pydata.org/) for visualization
+- [Matplotlib](https://matplotlib.org/) and [Seaborn](https://seaborn.pydata.org/) for visualisation
