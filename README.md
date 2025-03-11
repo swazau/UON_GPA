@@ -12,7 +12,17 @@ A Python tool for visualising academic performance and calculating GPAs from CSV
 
 ## Screenshots
 
-*[Add your screenshots here once you've generated them]*
+### GPA Trend
+![GPA Trend Visualization](screenshots/gpa_trend.png)
+
+### Grade Distribution
+![Grade Distribution](screenshots/grade_distribution.png)
+
+### Mark Distribution
+![Mark Distribution](screenshots/mark_distribution.png)
+
+### Course Performance
+![Course Performance](screenshots/course_performance.png)
 
 ## Installation
 
