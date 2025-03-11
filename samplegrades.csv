@@ -1,0 +1,23 @@
+semester,course_code,grade,mark,units,class_title
+2022-S1,COMP1010,P,54,10,Computing Fundamentals
+2022-S1,INFT1004,HD,93,10,Introduction to Programming
+2022-S1,MATH1002,C,71,10,Foundational Studies
+2022-S1,SENG1110,D,82,10,Object Oriented Programming
+2022-S2,COMP1140,F,42,10,Database & Info Mngt
+2022-S2,MATH1510,HD,89,10,Discrete Mathematics
+2022-S2,SENG1050,P,57,10,Web Technologies
+2022-S2,SENG1120,D,85,10,Data Structures
+2023-S1,INFT2031,HD,96,10,Systems & Network Admin
+2023-S1,MATH1110,C,73,10,Maths for Eng Sci & Tech 1
+2023-S1,SENG2130,D,76,10,Systems Analysis and Design
+2023-S2,COMP2230,HD,94,10,Algorithms
+2023-S2,COMP2240,C,68,10,Operating Systems
+2023-S2,SENG2250,P,58,10,System and Network Security
+2023-S2,SENG2260,HD,97,10,Human-Computer Interaction
+2024-S1,COMP3330,D,77,10,Machine Intelligence
+2024-S1,COMP3500,HD,92,10,Security Attacks
+2024-S1,COMP3851A,NA,,0,CompInfoSci WIL A
+2024-S1,INFT3800,C,67,10,Professional Practice in IT
+2024-S2,COMP3600,F,43,10,Cyber Governance Risk & Comp
+2024-S2,COMP3851B,HD,98,20,CompInfoSci WIL Part B
+2024-S2,SENG4500,D,79,10,Network & Dist Computing
