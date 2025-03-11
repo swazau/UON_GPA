@@ -38,7 +38,7 @@ A Python tool for visualising academic performance and calculating GPAs from CSV
 ```bash
 # Clone the repository
 git clone https://github.com/swazau/UON_GPA.git
-cd gpa-visualiser
+cd UON_GPA
 
 # Run the setup script
 setup.bat
@@ -49,7 +49,7 @@ setup.bat
 ```bash
 # Clone the repository
 git clone https://github.com/swazau/UON_GPA.git
-cd gpa-visualiser
+cd UON_GPA
 
 # Make the setup script executable
 chmod +x setup.sh
@@ -63,7 +63,7 @@ chmod +x setup.sh
 ```bash
 # Clone the repository
 git clone https://github.com/swazau/UON_GPA.git
-cd gpa-visualiser
+cd UON_GPA
 
 # Create a virtual environment
 python -m venv venv
