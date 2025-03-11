@@ -91,7 +91,7 @@ Create a CSV file with your grade data. The file should include the following co
 - `units`: Credit units for the course
 - `class_title`: Full name of the course
 
-You can use `sample_grades.csv` as a template.
+You can use `sample_grades.csv` as a template. The easiest way to do this is just put your unofficial transcript and my template into ChatGPT, and it will reformat it correctly.
 
 ### Run the Program
 
