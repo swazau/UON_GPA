@@ -401,7 +401,7 @@ class WAMCalculator:
                      f'{height:.2f}', ha='center', va='bottom')
 
         # Highlight the Honours WAM bar
-        plt.text(1, wam_2000_plus['raw_wam'] / 2, "DEFAULT",
+        plt.text(1, wam_2000_plus['raw_wam'] / 2, "HONOURS",
                  ha='center', va='center', color='white',
                  fontweight='bold', rotation=90)
 
