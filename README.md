@@ -123,7 +123,7 @@ You can use `samplegrades.csv` as a template. The easiest way to do this is just
 To calculate GPA with the default `samplegrades.csv` file:
 
 ```bash
-python main.py
+python gpa.py
 ```
 
 To calculate WAM with the default `samplegrades.csv` file:
@@ -135,7 +135,7 @@ python wam.py
 To specify a different CSV file:
 
 ```bash
-python main.py your_grades_file.csv
+python gpa.py your_grades_file.csv
 python wam.py your_grades_file.csv
 ```
 
@@ -199,4 +199,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [University of Newcastle GPA Calculator](https://www.newcastle.edu.au/current-students/study-essentials/assessment-and-exams/results/gpa-calculator)
 - [University of Newcastle WAM Calculation Guideline](https://policies.newcastle.edu.au/document/view-current.php?id=3)
 - [Pandas](https://pandas.pydata.org/) for data manipulation
-- [Matplotlib](https://matplotlib.org/) and [Seaborn](https://seaborn.pydata.org/) for visualisationtlib](https://matplotlib.org/) and [Seaborn](https://seaborn.pydata.org/) for visualisation
+- [Matplotlib](https://matplotlib.org/) and [Seaborn](https://seaborn.pydata.org/) for visualisation

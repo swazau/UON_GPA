@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from pathlib import Path
 from typing import Dict, Optional
+import os
 
 
 class WAMCalculator:
@@ -167,6 +168,17 @@ class WAMCalculator:
 
         rounded_wam = round_wam(final_wam)
 
+        # Determine honours class based on WAM
+        honours_class = ""
+        if final_wam >= 77:
+            honours_class = "Class I"
+        elif final_wam >= 72:
+            honours_class = "Class II Division 1"
+        elif final_wam >= 67:
+            honours_class = "Class II Division 2"
+        else:
+            honours_class = "Ungraded"
+
         # Prepare result dictionary
         result = {
             'calculation_type': calculation_type,
@@ -175,89 +187,11 @@ class WAMCalculator:
             'up_grades_included': include_up_grades,
             'raw_wam': final_wam,
             'rounded_wam': rounded_wam,
+            'honours_class': honours_class,
             'course_level_counts': df_wam.groupby('course_level')['units'].sum().to_dict()
         }
 
         return result
-
-    def plot_wam_comparison(self, df: pd.DataFrame, output_path: str = 'wam_comparison.png') -> None:
-        """
-        Create a bar chart comparing WAM calculations with different criteria,
-        highlighting the Honours WAM (2000+ level courses)
-
-        Parameters:
-        df (pd.DataFrame): DataFrame containing grade data
-        output_path (str): Path to save the plot
-        """
-        # Calculate different types of WAM
-        wam_all = self.calculate_wam(df, 'cumulative')
-        wam_2000_plus = self.calculate_wam(df, 'level', 2000)  # Honours WAM
-        wam_3000_plus = self.calculate_wam(df, 'level', 3000)
-
-        # Create comparison data
-        wam_types = ['Cumulative', '2000+ Level\n(Honours WAM)', '3000+ Level']
-        wam_values = [wam_all['raw_wam'], wam_2000_plus['raw_wam'], wam_3000_plus['raw_wam']]
-
-        # Create color palette with emphasis on Honours WAM
-        colors = [sns.color_palette("husl")[2],
-                  sns.color_palette("husl")[0],  # Highlight color for Honours WAM
-                  sns.color_palette("husl")[2]]
-
-        # Create plot
-        plt.figure(figsize=(10, 6))
-        bars = plt.bar(wam_types, wam_values, color=colors)
-
-        # Add value labels on top of bars
-        for bar in bars:
-            height = bar.get_height()
-            plt.text(bar.get_x() + bar.get_width() / 2., height + 0.5,
-                     f'{height:.2f}', ha='center', va='bottom')
-
-        # Highlight the Honours WAM bar
-        plt.text(1, wam_2000_plus['raw_wam'] / 2, "DEFAULT",
-                 ha='center', va='center', color='white',
-                 fontweight='bold', rotation=90)
-
-        plt.title('WAM Comparison by Course Level Inclusion')
-        plt.ylabel('Weighted Average Mark')
-        plt.ylim(0, 100)  # Set y-axis to mark scale
-        plt.grid(axis='y', linestyle='--', alpha=0.7)
-        plt.savefig(output_path, bbox_inches='tight', dpi=300)
-        plt.close()
-
-    def plot_mark_distribution(self, df: pd.DataFrame, output_path: str = 'wam_mark_distribution.png') -> None:
-        """Create a histogram of numerical marks with WAM thresholds"""
-        plt.figure(figsize=(10, 6))
-        valid_marks = df[df['mark'].notna()]['mark']
-
-        # Plot histogram
-        sns.histplot(data=valid_marks, bins=10, kde=True, color=sns.color_palette("husl")[2])
-
-        # Add mean line
-        plt.axvline(valid_marks.mean(), color='red', linestyle='--',
-                    label=f'Mean: {valid_marks.mean():.1f}')
-
-        # Add common WAM thresholds
-        thresholds = {
-            'HD (85+)': 85,
-            'D (75-84)': 75,
-            'C (65-74)': 65,
-            'P (50-64)': 50,
-            'F (<50)': 50
-        }
-
-        colors = ['darkgreen', 'green', 'orange', 'red']
-        for i, (label, value) in enumerate(list(thresholds.items())[:-1]):
-            plt.axvline(value, color=colors[i], linestyle='-.',
-                        alpha=0.7, label=label)
-
-        plt.title('Distribution of Marks with WAM Grade Thresholds')
-        plt.xlabel('Mark')
-        plt.ylabel('Count')
-        plt.legend()
-        plt.grid(True, alpha=0.3)
-        plt.savefig(output_path, bbox_inches='tight', dpi=300)
-        plt.close()
 
     def calculate_semester_wam(self, df: pd.DataFrame) -> pd.DataFrame:
         """
@@ -439,6 +373,162 @@ class WAMCalculator:
         plt.savefig(output_path, bbox_inches='tight', dpi=300)
         plt.close()
 
+    def plot_wam_comparison(self, df: pd.DataFrame, output_path: str = 'wam_comparison.png') -> None:
+        """
+        Create a bar chart comparing WAM calculations with different criteria,
+        highlighting the Honours WAM (2000+ level courses)
+
+        Parameters:
+        df (pd.DataFrame): DataFrame containing grade data
+        output_path (str): Path to save the plot
+        """
+        # Calculate different types of WAM
+        wam_all = self.calculate_wam(df, 'cumulative')
+        wam_2000_plus = self.calculate_wam(df, 'level', 2000)  # Honours WAM
+        wam_3000_plus = self.calculate_wam(df, 'level', 3000)
+
+        # Create comparison data
+        wam_types = ['Cumulative', '2000+ Level\n(Honours WAM)', '3000+ Level']
+        wam_values = [wam_all['raw_wam'], wam_2000_plus['raw_wam'], wam_3000_plus['raw_wam']]
+
+        # Create color palette with emphasis on Honours WAM
+        colors = [sns.color_palette("husl")[2],
+                  sns.color_palette("husl")[0],  # Highlight color for Honours WAM
+                  sns.color_palette("husl")[2]]
+
+        # Create plot
+        plt.figure(figsize=(10, 6))
+        bars = plt.bar(wam_types, wam_values, color=colors)
+
+        # Add value labels on top of bars
+        for bar in bars:
+            height = bar.get_height()
+            plt.text(bar.get_x() + bar.get_width() / 2., height + 0.5,
+                     f'{height:.2f}', ha='center', va='bottom')
+
+        # Highlight the Honours WAM bar
+        plt.text(1, wam_2000_plus['raw_wam'] / 2, "DEFAULT",
+                 ha='center', va='center', color='white',
+                 fontweight='bold', rotation=90)
+
+        plt.title('WAM Comparison by Course Level Inclusion')
+        plt.ylabel('Weighted Average Mark')
+        plt.ylim(0, 100)  # Set y-axis to mark scale
+        plt.grid(axis='y', linestyle='--', alpha=0.7)
+        plt.savefig(output_path, bbox_inches='tight', dpi=300)
+        plt.close()
+
+    def plot_mark_distribution(self, df: pd.DataFrame, output_path: str = 'wam_mark_distribution.png') -> None:
+        """Create a histogram of numerical marks with WAM thresholds"""
+        plt.figure(figsize=(10, 6))
+        valid_marks = df[df['mark'].notna()]['mark']
+
+        # Plot histogram
+        sns.histplot(data=valid_marks, bins=10, kde=True, color=sns.color_palette("husl")[2])
+
+        # Add mean line
+        plt.axvline(valid_marks.mean(), color='red', linestyle='--',
+                    label=f'Mean: {valid_marks.mean():.1f}')
+
+        # Add honors class thresholds
+        thresholds = {
+            'Class I (77+)': 77,
+            'Class II Div 1 (72-76)': 72,
+            'Class II Div 2 (67-71)': 67,
+            'Ungraded (<67)': 67
+        }
+
+        colors = ['darkgreen', 'green', 'orange', 'gray']
+        for i, (label, value) in enumerate(list(thresholds.items())[:-1]):
+            plt.axvline(value, color=colors[i], linestyle='-.',
+                        alpha=0.7, label=label)
+
+        plt.title('Distribution of Marks with Honours Class Thresholds')
+        plt.xlabel('Mark')
+        plt.ylabel('Count')
+        plt.legend()
+        plt.grid(True, alpha=0.3)
+        plt.savefig(output_path, bbox_inches='tight', dpi=300)
+        plt.close()
+
+    def plot_honours_thresholds(self, df: pd.DataFrame, output_path: str = 'honours_thresholds.png') -> None:
+
+        # Calculate Honours WAM (2000+ level courses)
+        honours_wam = self.calculate_wam(df, 'level', 2000)
+
+        plt.figure(figsize=(14, 8))
+
+        thresholds = [
+            {'min': 77, 'max': 100, 'label': 'Class I', 'color': '#4CAF50'},  # Green
+            {'min': 72, 'max': 77, 'label': 'Class II Division 1', 'color': '#8BC34A'},  # Light Green
+            {'min': 67, 'max': 72, 'label': 'Class II Division 2', 'color': '#FFC107'},  # Amber
+            {'min': 60, 'max': 67, 'label': 'Ungraded', 'color': '#E0E0E0'}  # Light Grey
+        ]
+
+        ax = plt.gca()
+        ax.add_patch(plt.Rectangle((60, 0.1), 40, 0.8, color='#F5F5F5', alpha=0.5, zorder=0))
+        y_pos = 0.5
+
+        for threshold in thresholds:
+            plt.barh(y_pos, threshold['max'] - threshold['min'], left=threshold['min'],
+                     height=0.4, color=threshold['color'], alpha=0.9,
+                     edgecolor='white', linewidth=1, zorder=2)
+
+        for threshold in thresholds:
+            mid_point = threshold['min'] + (threshold['max'] - threshold['min']) / 2
+            # Only add label if range is wide enough
+            if threshold['max'] - threshold['min'] > 5:
+                plt.text(mid_point, y_pos, threshold['label'],
+                         ha='center', va='center', color='white', fontweight='bold',
+                         fontsize=14, zorder=3)
+
+        line_color = '#E53935'  # Bright red
+        plt.axvline(x=honours_wam['raw_wam'], color=line_color, linestyle='-', linewidth=3, zorder=4)
+
+        text_box = plt.text(honours_wam['raw_wam'], 1.3,
+                            f"Your WAM: {honours_wam['raw_wam']:.2f}",
+                            ha='center', va='center', color='black', fontsize=16, fontweight='bold',
+                            bbox=dict(facecolor='white', edgecolor=line_color, alpha=0.95,
+                                      boxstyle='round,pad=0.6', linewidth=2), zorder=5)
+
+
+        arrow_props = dict(arrowstyle='->', color=line_color, linewidth=3, shrinkA=0, shrinkB=0)
+        plt.annotate('', xy=(honours_wam['raw_wam'], 0.7), xytext=(honours_wam['raw_wam'], 0.85),
+                     arrowprops=arrow_props, zorder=5)
+
+        # Set plot properties
+        plt.xlim(60, 100)  # Focus on the relevant range
+        plt.ylim(0, 2)  # Keep space for the labels
+
+        # Remove axes but keep bottom axis ticks for reference
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['left'].set_visible(False)
+        ax.get_yaxis().set_visible(False)
+
+        # Customise x-axis with cleaner tick marks
+        plt.xticks([67, 72, 77, 85, 90, 95, 100], fontsize=12)
+        ax.tick_params(axis='x', which='both', length=5, width=1, direction='out', pad=10)
+
+        # Add threshold labels below the axis with more spacing
+        threshold_labels = [
+            {'pos': 67, 'text': 'Class II Div 2\nThreshold'},
+            {'pos': 72, 'text': 'Class II Div 1\nThreshold'},
+            {'pos': 77, 'text': 'Class I\nThreshold'}
+        ]
+
+        for label in threshold_labels:
+            plt.annotate(label['text'], xy=(label['pos'], -0.1), xycoords=('data', 'axes fraction'),
+                         ha='center', va='top', fontsize=11,
+                         bbox=dict(boxstyle='round,pad=0.4', fc='#F5F5F5', ec='#CCCCCC', alpha=0.8))
+
+        # Add title with improved styling
+        plt.title('Honours Classification', fontsize=22, fontweight='bold', pad=20)
+
+        # Save the figure with tight layout
+        plt.tight_layout()
+        plt.savefig(output_path, bbox_inches='tight', dpi=300)
+        plt.close()
     def generate_wam_report(self, df: pd.DataFrame) -> str:
         """
         Generate a detailed WAM report as a formatted string
@@ -462,17 +552,20 @@ class WAMCalculator:
         report.append("\nCumulative WAM (all courses):")
         report.append(f"Raw WAM: {wam_all['raw_wam']:.2f}")
         report.append(f"Rounded WAM: {wam_all['rounded_wam']}")
+        report.append(f"Honours Class: {wam_all['honours_class']}")
         report.append(f"Total units: {wam_all['total_units']}")
         report.append(f"UP grades included: {'Yes' if wam_all['up_grades_included'] else 'No'}")
 
         report.append("\nWAM for 2000+ level courses:")
         report.append(f"Raw WAM: {wam_2000_plus['raw_wam']:.2f}")
         report.append(f"Rounded WAM: {wam_2000_plus['rounded_wam']}")
+        report.append(f"Honours Class: {wam_2000_plus['honours_class']}")
         report.append(f"Total units: {wam_2000_plus['total_units']}")
 
         report.append("\nWAM for 3000+ level courses (Honours WAM):")
         report.append(f"Raw WAM: {wam_3000_plus['raw_wam']:.2f}")
         report.append(f"Rounded WAM: {wam_3000_plus['rounded_wam']}")
+        report.append(f"Honours Class: {wam_3000_plus['honours_class']}")
         report.append(f"Total units: {wam_3000_plus['total_units']}")
 
         report.append("\nCourse level distribution:")
@@ -511,6 +604,13 @@ class WAMCalculator:
         return "\n".join(report)
 
 
+def ensure_dir(directory):
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+        print(f"Created directory: {directory}")
+    return directory
+
+
 def main():
     calculator = WAMCalculator()
 
@@ -524,7 +624,7 @@ def main():
         print("Please ensure your CSV file exists and has the correct format.")
         return
 
-    # Generate WAM report with honours calculation (2000+ level courses) as default
+    # Generate Honours WAM as the primary result
     try:
         # Calculate honours WAM (2000+ level courses)
         honours_wam = calculator.calculate_wam(df, 'level', 2000)
@@ -534,6 +634,7 @@ def main():
         print("=" * 50)
         print(f"Raw WAM: {honours_wam['raw_wam']:.2f}")
         print(f"Rounded WAM: {honours_wam['rounded_wam']}")
+        print(f"Honours Class: {honours_wam['honours_class']}")
         print(f"Total units: {honours_wam['total_units']}")
 
         # Generate full WAM report for reference
@@ -546,15 +647,19 @@ def main():
         print("WAM calculation requires valid course codes with level information.")
         return
 
+    wam_dir = ensure_dir("WAM")
     # Generate WAM visualisations
     try:
-        calculator.plot_wam_comparison(df)
-        calculator.plot_mark_distribution(df)
-        calculator.plot_wam_trend(df)
-        print("\nGenerated visualisations:")
-        print("- WAM comparison chart: wam_comparison.png")
-        print("- Mark distribution with WAM thresholds: wam_mark_distribution.png")
-        print("- WAM trend by semester: wam_trend.png")
+        calculator.plot_wam_comparison(df, os.path.join(wam_dir, 'wam_comparison.png'))
+        calculator.plot_mark_distribution(df, os.path.join(wam_dir, 'wam_mark_distribution.png'))
+        calculator.plot_wam_trend(df, os.path.join(wam_dir, 'wam_trend.png'))
+        calculator.plot_honours_thresholds(df, os.path.join(wam_dir, 'honours_thresholds.png'))
+
+        print("\nGenerated visualizations:")
+        print(f"- WAM comparison chart: {os.path.join(wam_dir, 'wam_comparison.png')}")
+        print(f"- Mark distribution with honours thresholds: {os.path.join(wam_dir, 'wam_mark_distribution.png')}")
+        print(f"- WAM trend by semester: {os.path.join(wam_dir, 'wam_trend.png')}")
+        print(f"- Honours class thresholds: {os.path.join(wam_dir, 'honours_thresholds.png')}")
 
         # Print semester WAM information
         semester_wam_df = calculator.calculate_semester_wam(df)
@@ -565,7 +670,7 @@ def main():
         for _, row in semester_wam_df.iterrows():
             print(f"{row['semester']:<10} {row['units']:>8} {row['wam']:>8.2f}")
     except Exception as e:
-        print(f"\nError generating visualisations: {e}")
+        print(f"\nError generating visualizations: {e}")
 
 
 if __name__ == "__main__":
