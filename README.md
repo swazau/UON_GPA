@@ -194,8 +194,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-Here's the refactored Acknowledgments section with consistent formatting for all links:
-
 ## Acknowledgments
 
 - [University of Newcastle GPA Calculator](https://www.newcastle.edu.au/current-students/study-essentials/assessment-and-exams/results/gpa-calculator)
