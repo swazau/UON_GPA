@@ -1,6 +1,12 @@
 # GPA and WAM Calculator
 
-A Python tool for visualising academic performance and calculating GPAs and WAMs from CSV grade data, designed for the University of Newcastle grading system: https://www.newcastle.edu.au/current-students/study-essentials/assessment-and-exams/results/gpa-calculator
+A Python tool for visualising academic performance and calculating GPAs and WAMs from CSV grade data, designed for the University of Newcastle grading system.
+
+GPA:
+https://www.newcastle.edu.au/current-students/study-essentials/assessment-and-exams/results/gpa-calculator
+
+WAM:
+https://policies.newcastle.edu.au/document/view-current.php?id=3
 
 ## Features
 
