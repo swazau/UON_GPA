@@ -81,10 +81,6 @@ class WAMCalculator:
             if 'year' in df_wam.columns:
                 year = df_wam['year'].max()  # Using the most recent year as an example
                 df_wam = df_wam[df_wam['year'] == year]
-            else:
-                print("Warning: 'annual' calculation type needs a 'year' column. Using all data.")
-
-        # Apply the WAM calculation rules according to the guidelines
 
         # Define the weighting based on course level
         level_weights = {
@@ -358,8 +354,6 @@ class WAMCalculator:
             label='Cumulative WAM'
         )
 
-        # Numbers on plot points have been removed as requested
-
         # Set plot properties
         plt.title('WAM Trend by Semester', fontsize=16)
         plt.xlabel('Semester', fontsize=12)
@@ -491,7 +485,6 @@ class WAMCalculator:
                             bbox=dict(facecolor='white', edgecolor=line_color, alpha=0.95,
                                       boxstyle='round,pad=0.6', linewidth=2), zorder=5)
 
-
         arrow_props = dict(arrowstyle='->', color=line_color, linewidth=3, shrinkA=0, shrinkB=0)
         plt.annotate('', xy=(honours_wam['raw_wam'], 0.7), xytext=(honours_wam['raw_wam'], 0.85),
                      arrowprops=arrow_props, zorder=5)
@@ -529,79 +522,6 @@ class WAMCalculator:
         plt.tight_layout()
         plt.savefig(output_path, bbox_inches='tight', dpi=300)
         plt.close()
-    def generate_wam_report(self, df: pd.DataFrame) -> str:
-        """
-        Generate a detailed WAM report as a formatted string
-
-        Parameters:
-        df (pd.DataFrame): DataFrame containing grade data
-
-        Returns:
-        str: Formatted WAM report
-        """
-        # Calculate WAMs
-        wam_all = self.calculate_wam(df, 'cumulative')
-        wam_2000_plus = self.calculate_wam(df, 'level', 2000)
-        wam_3000_plus = self.calculate_wam(df, 'level', 3000)
-
-        # Format the report
-        report = []
-        report.append("\nWAM (Weighted Average Mark) Report")
-        report.append("=" * 50)
-
-        report.append("\nCumulative WAM (all courses):")
-        report.append(f"Raw WAM: {wam_all['raw_wam']:.2f}")
-        report.append(f"Rounded WAM: {wam_all['rounded_wam']}")
-        report.append(f"Honours Class: {wam_all['honours_class']}")
-        report.append(f"Total units: {wam_all['total_units']}")
-        report.append(f"UP grades included: {'Yes' if wam_all['up_grades_included'] else 'No'}")
-
-        report.append("\nWAM for 2000+ level courses:")
-        report.append(f"Raw WAM: {wam_2000_plus['raw_wam']:.2f}")
-        report.append(f"Rounded WAM: {wam_2000_plus['rounded_wam']}")
-        report.append(f"Honours Class: {wam_2000_plus['honours_class']}")
-        report.append(f"Total units: {wam_2000_plus['total_units']}")
-
-        report.append("\nWAM for 3000+ level courses (Honours WAM):")
-        report.append(f"Raw WAM: {wam_3000_plus['raw_wam']:.2f}")
-        report.append(f"Rounded WAM: {wam_3000_plus['rounded_wam']}")
-        report.append(f"Honours Class: {wam_3000_plus['honours_class']}")
-        report.append(f"Total units: {wam_3000_plus['total_units']}")
-
-        report.append("\nCourse level distribution:")
-        for level, units in sorted(wam_all['course_level_counts'].items()):
-            report.append(f"{level} level: {units} units")
-
-        # Add course-level performance for WAM calculation
-        report.append("\nDetailed course performance for WAM calculation:")
-        report.append("-" * 80)
-        report.append(
-            f"{'Course':<12} {'Level':<8} {'Mark':<8} {'Grade':<6} {'Units':<8} {'Weight':<8} {'WAM Points':<12}")
-        report.append("-" * 80)
-
-        for _, row in df.sort_values('course_code').iterrows():
-            level = int(row['course_code'][4]) * 1000  # Extract level from course code
-            weight = 1
-            if level >= 2000:
-                weight = 2
-            if level >= 3000:
-                weight = 3
-            if level >= 4000:
-                weight = 4
-
-            # Calculate WAM mark similar to map_mark_for_wam function
-            wam_mark = row['mark']
-            if row['grade'] == 'UP':
-                wam_mark = 58
-            elif row['grade'] == 'F' and row['mark'] < 45:
-                wam_mark = 44
-
-            wam_points = wam_mark * row['units'] * weight
-
-            report.append(
-                f"{row['course_code']:<12} {level:<8} {wam_mark:<8.1f} {row['grade']:<6} {row['units']:<8} {weight:<8} {wam_points:<12.1f}")
-
-        return "\n".join(report)
 
 
 def ensure_dir(directory):
@@ -616,38 +536,24 @@ def main():
 
     # Check if samplegrades.csv file exists and use it
     try:
-        print("Attempting to load data from samplegrades.csv...")
         df = calculator.load_from_csv('samplegrades.csv')
-        print("Successfully loaded data from samplegrades.csv.")
     except (FileNotFoundError, ValueError) as e:
         print(f"Error loading CSV: {e}")
-        print("Please ensure your CSV file exists and has the correct format.")
         return
 
-    # Generate Honours WAM as the primary result
-    try:
-        # Calculate honours WAM (2000+ level courses)
-        honours_wam = calculator.calculate_wam(df, 'level', 2000)
+    # Calculate honours WAM (2000+ level courses)
+    honours_wam = calculator.calculate_wam(df, 'level', 2000)
 
-        # Print Honours WAM as the primary result
-        print("\nHonours WAM Calculation (2000+ level courses)")
-        print("=" * 50)
-        print(f"Raw WAM: {honours_wam['raw_wam']:.2f}")
-        print(f"Rounded WAM: {honours_wam['rounded_wam']}")
-        print(f"Honours Class: {honours_wam['honours_class']}")
-        print(f"Total units: {honours_wam['total_units']}")
-
-        # Generate full WAM report for reference
-        wam_report = calculator.generate_wam_report(df)
-        print("\n" + "=" * 50)
-        print("ADDITIONAL WAM CALCULATIONS FOR REFERENCE:")
-        print(wam_report)
-    except Exception as e:
-        print(f"\nError calculating WAM: {e}")
-        print("WAM calculation requires valid course codes with level information.")
-        return
+    # Print only the Honours WAM result with minimal output
+    print("\nHonours WAM Calculation (2000+ level courses)")
+    print("=" * 50)
+    print(f"Raw WAM: {honours_wam['raw_wam']:.2f}")
+    print(f"Rounded WAM: {honours_wam['rounded_wam']}")
+    print(f"Honours Class: {honours_wam['honours_class']}")
+    print(f"Total units: {honours_wam['total_units']}")
 
     wam_dir = ensure_dir("WAM")
+
     # Generate WAM visualisations
     try:
         calculator.plot_wam_comparison(df, os.path.join(wam_dir, 'wam_comparison.png'))
@@ -655,20 +561,7 @@ def main():
         calculator.plot_wam_trend(df, os.path.join(wam_dir, 'wam_trend.png'))
         calculator.plot_honours_thresholds(df, os.path.join(wam_dir, 'honours_thresholds.png'))
 
-        print("\nGenerated visualizations:")
-        print(f"- WAM comparison chart: {os.path.join(wam_dir, 'wam_comparison.png')}")
-        print(f"- Mark distribution with honours thresholds: {os.path.join(wam_dir, 'wam_mark_distribution.png')}")
-        print(f"- WAM trend by semester: {os.path.join(wam_dir, 'wam_trend.png')}")
-        print(f"- Honours class thresholds: {os.path.join(wam_dir, 'honours_thresholds.png')}")
-
-        # Print semester WAM information
-        semester_wam_df = calculator.calculate_semester_wam(df)
-        print("\nSemester WAM Breakdown:")
-        print("-" * 40)
-        print(f"{'Semester':<10} {'Units':>8} {'WAM':>8}")
-        print("-" * 40)
-        for _, row in semester_wam_df.iterrows():
-            print(f"{row['semester']:<10} {row['units']:>8} {row['wam']:>8.2f}")
+        print("\nGenerated visualisations in WAM directory")
     except Exception as e:
         print(f"\nError generating visualizations: {e}")
 

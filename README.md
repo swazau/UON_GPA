@@ -49,6 +49,9 @@ The Honours WAM (used for determining honours classification) is calculated usin
 ### WAM Trend
 ![WAM Trend](screenshots/wam_trend.png)
 
+### WAM Honours Threshold
+![Honours Threshold](screenshots/honours_thresholds.png)
+
 ## Installation
 
 ### Prerequisites
@@ -76,11 +79,8 @@ setup.bat
 git clone https://github.com/swazau/UON_GPA.git
 cd UON_GPA
 
-# Make the setup script executable
-chmod +x setup.sh
-
-# Run the setup script
-./setup.sh
+# Make the setup script executable and run
+chmod +x setup.sh && ./setup.sh
 ```
 
 ### Option 2: Manual Setup
@@ -158,6 +158,7 @@ The program generates:
    - `wam_comparison.png`: Bar chart comparing different WAM calculations
    - `wam_mark_distribution.png`: Histogram with WAM thresholds
    - `wam_trend.png`: Line chart showing semester and cumulative WAM trends
+   - `honours_threshold.png`: The Honours Thresholds graph is a custom horizontal bar chart that visually displays where your calculated WAM
 
 ## Grade Scales
 
