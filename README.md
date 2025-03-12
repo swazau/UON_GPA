@@ -2,12 +2,6 @@
 
 A Python tool for visualising academic performance and calculating GPAs and WAMs from CSV grade data, designed for the University of Newcastle grading system.
 
-GPA:
-https://www.newcastle.edu.au/current-students/study-essentials/assessment-and-exams/results/gpa-calculator
-
-WAM:
-https://policies.newcastle.edu.au/document/view-current.php?id=3
-
 ## Features
 
 ### GPA Calculator
@@ -200,7 +194,11 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
+Here's the refactored Acknowledgments section with consistent formatting for all links:
+
 ## Acknowledgments
 
+- [University of Newcastle GPA Calculator](https://www.newcastle.edu.au/current-students/study-essentials/assessment-and-exams/results/gpa-calculator)
+- [University of Newcastle WAM Calculation Guideline](https://policies.newcastle.edu.au/document/view-current.php?id=3)
 - [Pandas](https://pandas.pydata.org/) for data manipulation
-- [Matplotlib](https://matplotlib.org/) and [Seaborn](https://seaborn.pydata.org/) for visualisation
+- [Matplotlib](https://matplotlib.org/) and [Seaborn](https://seaborn.pydata.org/) for visualisationtlib](https://matplotlib.org/) and [Seaborn](https://seaborn.pydata.org/) for visualisation
