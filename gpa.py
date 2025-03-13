@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from pathlib import Path
 from typing import Dict, Optional
+import os
 
 
 class GPAVisualiser:
@@ -243,6 +244,13 @@ class GPAVisualiser:
         plt.close()
 
 
+def ensure_dir(directory):
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+        print(f"Created directory: {directory}")
+    return directory
+
+
 def main():
     visualiser = GPAVisualiser()
 
@@ -278,11 +286,13 @@ def main():
     print(f"{'Total':<6} {results['total_units']:>8} {results['total_points']:>8}")
     print(f"\nGPA: {results['gpa']}")
 
-    # Generate visualizations
-    visualiser.plot_grade_distribution(df)
-    visualiser.plot_mark_distribution(df)
-    visualiser.plot_course_performance(df)
-    visualiser.plot_gpa_trend(df)
+    gpa_dir = ensure_dir("GPA")
+
+    # Generate visualisations
+    visualiser.plot_grade_distribution(df, os.path.join(gpa_dir, 'grade_distribution.png'))
+    visualiser.plot_mark_distribution(df, os.path.join(gpa_dir, 'mark_distribution.png'))
+    visualiser.plot_course_performance(df, os.path.join(gpa_dir, 'course_performance.png'))
+    visualiser.plot_gpa_trend(df, os.path.join(gpa_dir, 'gpa_trend.png'))
 
     # Print semester GPA information
     semester_gpa_df = visualiser.calculate_semester_gpa(df)

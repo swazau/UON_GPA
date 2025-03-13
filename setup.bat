@@ -26,8 +26,13 @@ echo Setup complete!
 echo To activate the environment in the future, run:
 echo venv\Scripts\activate.bat
 echo.
-echo To run the GPA Visualizer:
-echo python main.py
+echo To run the GPA Visualiser:
+echo python gpa.py
 echo or
-echo python main.py your_grades_file.csv
+echo python gpa.py your_grades_file.csv
+echo ===================================
+echo To run the WAM Visualiser:
+echo python wam.py
+echo or
+echo python wam.py your_grades_file.csv
 echo ===================================
