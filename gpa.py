@@ -36,8 +36,8 @@ class GPAVisualiser:
         # Read CSV file
         df = pd.read_csv(csv_path)
 
-        # Validate required columns
-        required_columns = ['semester', 'course_code', 'grade', 'mark', 'units', 'class_title']
+        # Validate required columns - removed class_title from required columns
+        required_columns = ['semester', 'course_code', 'grade', 'mark', 'units']
         missing_columns = [col for col in required_columns if col not in df.columns]
 
         if missing_columns:
@@ -254,15 +254,18 @@ def ensure_dir(directory):
 def main():
     visualiser = GPAVisualiser()
 
-    # Check if dan_grades.csv file exists and use it, otherwise use the built-in data
+    # Get the CSV file path from command line arguments or use the default
+    import sys
+    csv_path = sys.argv[1] if len(sys.argv) > 1 else 'samplegrades.csv'
+
+    # Check if the CSV file exists and use it
     try:
-        print("Attempting to load data from dan_grades.csv...")
-        df = visualiser.load_from_csv('samplegrades.csv')
-        print("Successfully loaded data from dan_grades.csv.")
+        print(f"Attempting to load data from {csv_path}...")
+        df = visualiser.load_from_csv(csv_path)
+        print(f"Successfully loaded data from {csv_path}.")
     except (FileNotFoundError, ValueError) as e:
         print(f"Error loading CSV: {e}")
-        print("Falling back to built-in data.")
-        df = visualiser.create_grade_data()
+        return
 
     # Calculate GPA using university method
     results = visualiser.calculate_university_gpa(df)

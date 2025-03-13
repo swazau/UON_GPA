@@ -29,8 +29,8 @@ class WAMCalculator:
         # Read CSV file
         df = pd.read_csv(csv_path)
 
-        # Validate required columns
-        required_columns = ['semester', 'course_code', 'grade', 'mark', 'units', 'class_title']
+        # Validate required columns - removed class_title from required columns
+        required_columns = ['semester', 'course_code', 'grade', 'mark', 'units']
         missing_columns = [col for col in required_columns if col not in df.columns]
 
         if missing_columns:
@@ -534,9 +534,13 @@ def ensure_dir(directory):
 def main():
     calculator = WAMCalculator()
 
-    # Check if samplegrades.csv file exists and use it
+    # Get the CSV file path from command line arguments or use the default
+    import sys
+    csv_path = sys.argv[1] if len(sys.argv) > 1 else 'samplegrades.csv'
+
+    # Check if CSV file exists and use it
     try:
-        df = calculator.load_from_csv('samplegrades.csv')
+        df = calculator.load_from_csv(csv_path)
     except (FileNotFoundError, ValueError) as e:
         print(f"Error loading CSV: {e}")
         return
