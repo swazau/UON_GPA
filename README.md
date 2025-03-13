@@ -95,39 +95,8 @@ pip install -r requirements.txt
 
 ## Usage
 
-### Prepare Your Data
-Create a CSV file with your grade data, including:
-- `semester`: e.g., '2023-S1'
-- `course_code`: e.g., 'COMP1010'
-- `grade`: HD, D, C, P, F, UP
-- `mark`: 0-100
-- `units`: Credit units
-- `class_title`: Course name
+streamlit run app.py
 
-Use `samplegrades.csv` as a template. Alternatively, provide an unofficial transcript as a PDF (e.g., `transcript.pdf`), and the program will extract the data using the `--pdf` flag. For best results, ensure the PDF follows the University of Newcastle format.
-
-*Tip*: If you would pefer to provide your own csv, use ChatGPT to reformat your transcript into CSV by providing it with `samplegrades.csv` and your transcript PDF.
-
-### Run the Programs
-
-#### With The Sample CSV:
-```bash
-python gpa.py
-python wam.py
-```
-
-#### With Custom CSV:
-```bash
-python gpa.py your_grades_file.csv
-python wam.py your_grades_file.csv
-```
-
-#### With PDF Transcript:
-```bash
-python gpa.py transcript.pdf --pdf
-python wam.py transcript.pdf --pdf
-```
-The `--pdf` flag uses `transcript_processor` to extract data and generate visualisations.
 
 ### Output
 
@@ -135,20 +104,20 @@ The `--pdf` flag uses `transcript_processor` to extract data and generate visual
 The program generates:
 1. Detailed GPA calculations in the console
 2. Four visualisation files:
-   - `grade_distribution.png`: Pie chart showing grade distribution by units
-   - `mark_distribution.png`: Histogram of numerical marks
-   - `course_performance.png`: Bar chart of performance by course
-   - `gpa_trend.png`: Line chart showing semester and cumulative GPA trends
+   - `grade_distribution`: Pie chart showing grade distribution by units
+   - `mark_distribution`: Histogram of numerical marks
+   - `course_performance`: Bar chart of performance by course
+   - `gpa_trend`: Line chart showing semester and cumulative GPA trends
 
 #### WAM Program Output
 The program generates:
 1. Honours WAM calculation (2000+ level courses) prominently displayed
 2. Additional WAM calculations for reference in the console
 3. Three visualisation files:
-   - `wam_comparison.png`: Bar chart comparing different WAM calculations
-   - `wam_mark_distribution.png`: Histogram with WAM thresholds
-   - `wam_trend.png`: Line chart showing semester and cumulative WAM trends
-   - `honours_threshold.png`: The Honours Thresholds graph is a custom horizontal bar chart that visually displays where your calculated WAM
+   - `wam_comparison`: Bar chart comparing different WAM calculations
+   - `wam_mark_distribution`: Histogram with WAM thresholds
+   - `wam_trend`: Line chart showing semester and cumulative WAM trends
+   - `honours_threshold`: The Honours Thresholds graph is a custom horizontal bar chart that visually displays where your calculated WAM
 
 ## Grade Scales
 
