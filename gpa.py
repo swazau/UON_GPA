@@ -4,6 +4,7 @@ import seaborn as sns
 from pathlib import Path
 from typing import Dict, Optional
 import os
+import argparse
 
 
 class GPAVisualiser:
@@ -252,20 +253,62 @@ def ensure_dir(directory):
 
 
 def main():
-    visualiser = GPAVisualiser()
+    #visualiser = GPAVisualiser()
 
-    # Get the CSV file path from command line arguments or use the default
-    import sys
-    csv_path = sys.argv[1] if len(sys.argv) > 1 else 'samplegrades.csv'
-
-    # Check if the CSV file exists and use it
     try:
-        print(f"Attempting to load data from {csv_path}...")
+        import transcript_processor
+    except ImportError:
+        print("Warning: transcript_processor module not found. PDF import functionality will be disabled.")
+        transcript_processor = None
+
+    parser = argparse.ArgumentParser(description='Calculate GPA from grade data')
+    parser.add_argument('file', nargs='?', help='CSV or PDF file containing grade data')
+    parser.add_argument('--pdf', action='store_true', help='Process input as PDF transcript')
+    args = parser.parse_args()
+
+    visualiser = GPAVisualiser()
+    csv_path = 'samplegrades.csv'  # Default
+
+    # Handle user-specified file
+    if args.file:
+        if args.pdf:
+            # Process PDF transcript if --pdf flag is set
+            print("pdf")
+            if transcript_processor:
+                print(f"Processing PDF transcript: {args.file}")
+                csv_path = transcript_processor.process_transcript(args.file)
+                if not csv_path:
+                    print("Error processing transcript. Using default sample data.")
+                    csv_path = 'samplegrades.csv'
+            else:
+                print("Transcript processor not available. Please install pdfplumber package.")
+                return
+        else:
+            # Assume it's a CSV file
+            csv_path = args.file
+
+    # Load data and continue with existing GPA calculation
+    try:
         df = visualiser.load_from_csv(csv_path)
-        print(f"Successfully loaded data from {csv_path}.")
+        print("Successfully loaded grade data.")
     except (FileNotFoundError, ValueError) as e:
         print(f"Error loading CSV: {e}")
-        return
+        print("Falling back to built-in data.")
+        df = visualiser.create_grade_data()
+
+
+    # Get the CSV file path from command line arguments or use the default
+    # import sys
+    # csv_path = sys.argv[1] if len(sys.argv) > 1 else 'samplegrades.csv'
+    #
+    # # Check if the CSV file exists and use it
+    # try:
+    #     print(f"Attempting to load data from {csv_path}...")
+    #     df = visualiser.load_from_csv(csv_path)
+    #     print(f"Successfully loaded data from {csv_path}.")
+    # except (FileNotFoundError, ValueError) as e:
+    #     print(f"Error loading CSV: {e}")
+    #     return
 
     # Calculate GPA using university method
     results = visualiser.calculate_university_gpa(df)

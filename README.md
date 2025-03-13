@@ -1,6 +1,6 @@
 # GPA and WAM Calculator
 
-A Python tool for visualising academic performance and calculating GPAs and WAMs from CSV grade data, designed for the University of Newcastle grading system.
+A Python tool for visualising academic performance and calculating GPAs and WAMs from CSV grade data or PDF transcripts, designed for the University of Newcastle grading system.
 
 ## Features
 
@@ -10,6 +10,7 @@ A Python tool for visualising academic performance and calculating GPAs and WAMs
 - 🥧 Generate grade distribution charts
 - 📉 Analyse mark distributions
 - 📋 View detailed course performance breakdowns
+- 📄 Process UON transcripts directly from PDF files
 
 ### WAM Calculator
 - 🎓 Calculate Honours WAM by default (2000+ level courses)
@@ -19,6 +20,7 @@ A Python tool for visualising academic performance and calculating GPAs and WAMs
 - 📈 Track WAM trends across semesters
 - 📉 View mark distribution with WAM thresholds
 - 📋 See detailed course-by-course breakdown
+- 📄 Process UON transcripts directly from PDF files
 
 ## What is WAM?
 
@@ -28,6 +30,7 @@ The Honours WAM (used for determining honours classification) is calculated usin
 - 2000 level courses: Weight = 2
 - 3000 level courses: Weight = 3
 - 4000/5000/6000 level courses: Weight = 4
+
 
 ## Screenshots
 
@@ -55,42 +58,29 @@ The Honours WAM (used for determining honours classification) is calculated usin
 ## Installation
 
 ### Prerequisites
-
 - Python 3.8 or higher
-- pip (Python package installer)
+- `pip` (Python package installer)
 
 ### Option 1: Quick Setup (Recommended)
 
 #### On Windows:
-
 ```bash
-# Clone the repository
 git clone https://github.com/swazau/UON_GPA.git
 cd UON_GPA
-
-# Run the setup script
 setup.bat
 ```
 
 #### On macOS/Linux:
-
 ```bash
-# Clone the repository
 git clone https://github.com/swazau/UON_GPA.git
 cd UON_GPA
-
-# Make the setup script executable and run
 chmod +x setup.sh && ./setup.sh
 ```
 
 ### Option 2: Manual Setup
-
 ```bash
-# Clone the repository
 git clone https://github.com/swazau/UON_GPA.git
 cd UON_GPA
-
-# Create a virtual environment
 python -m venv venv
 
 # Activate the virtual environment
@@ -106,38 +96,38 @@ pip install -r requirements.txt
 ## Usage
 
 ### Prepare Your Data
+Create a CSV file with your grade data, including:
+- `semester`: e.g., '2023-S1'
+- `course_code`: e.g., 'COMP1010'
+- `grade`: HD, D, C, P, F, UP
+- `mark`: 0-100
+- `units`: Credit units
+- `class_title`: Course name
 
-Create a CSV file with your grade data. The file should include the following columns:
+Use `samplegrades.csv` as a template. Alternatively, provide an unofficial transcript as a PDF (e.g., `transcript.pdf`), and the program will extract the data using the `--pdf` flag. For best results, ensure the PDF follows the University of Newcastle format.
 
-- `semester`: Academic term (e.g., '2023-S1')
-- `course_code`: Course identifier (e.g., 'COMP1010')
-- `grade`: Letter grade (HD, D, C, P, F, UP)
-- `mark`: Numerical score (0-100)
-- `units`: Credit units for the course
-- `class_title`: Full name of the course
-
-You can use `samplegrades.csv` as a template. The easiest way to do this is just put your unofficial transcript and my template into ChatGPT, and it will reformat it correctly.
+*Tip*: If you would pefer to provide your own csv, use ChatGPT to reformat your transcript into CSV by providing it with `samplegrades.csv` and your transcript PDF.
 
 ### Run the Programs
 
-To calculate GPA with the default `samplegrades.csv` file:
-
+#### With The Sample CSV:
 ```bash
 python gpa.py
-```
-
-To calculate WAM with the default `samplegrades.csv` file:
-
-```bash
 python wam.py
 ```
 
-To specify a different CSV file:
-
+#### With Custom CSV:
 ```bash
 python gpa.py your_grades_file.csv
 python wam.py your_grades_file.csv
 ```
+
+#### With PDF Transcript:
+```bash
+python gpa.py transcript.pdf --pdf
+python wam.py transcript.pdf --pdf
+```
+The `--pdf` flag uses `transcript_processor` to extract data and generate visualisations.
 
 ### Output
 
@@ -163,8 +153,6 @@ The program generates:
 ## Grade Scales
 
 ### GPA Scale
-This visualiser uses the following 7-point grade scale:
-
 | Grade | Points | Description        |
 |-------|---------|--------------------|
 | HD    | 7       | High Distinction   |
@@ -174,8 +162,6 @@ This visualiser uses the following 7-point grade scale:
 | F     | 0       | Fail               |
 
 ### WAM Mark Values
-The WAM calculator uses the following mark values:
-
 | Grade | Mark Range | Value for WAM |
 |-------|------------|---------------|
 | HD, D, C, P | 50-100 | Actual percentage mark |
@@ -196,7 +182,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Acknowledgments
-
 - [University of Newcastle GPA Calculator](https://www.newcastle.edu.au/current-students/study-essentials/assessment-and-exams/results/gpa-calculator)
 - [University of Newcastle WAM Calculation Guideline](https://policies.newcastle.edu.au/document/view-current.php?id=3)
 - [Pandas](https://pandas.pydata.org/) for data manipulation

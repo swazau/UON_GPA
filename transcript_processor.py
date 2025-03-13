@@ -101,51 +101,71 @@ def write_to_csv(data, filename):
         writer.writerows(data)
 
 
-def main():
-    # Check if PDF file is provided as a command-line argument
-    if len(sys.argv) > 1:
-        pdf_filename = sys.argv[1]
-        if not os.path.isfile(pdf_filename):
-            print(f"Error: File '{pdf_filename}' not found.")
-            sys.exit(1)
-    else:
-        # Prompt for PDF filename
-        pdf_filename = input("Enter the path to your transcript PDF: ")
-        if not os.path.isfile(pdf_filename):
-            print(f"Error: File '{pdf_filename}' not found.")
-            sys.exit(1)
+def process_transcript(pdf_path=None, output_csv=None):
+    """
+    Process a transcript PDF and return the path to the generated CSV.
+
+    Parameters:
+    pdf_path (str): Path to the PDF transcript. If None, will prompt.
+    output_csv (str): Path for the output CSV. If None, will generate a name.
+
+    Returns:
+    str: Path to the generated CSV file
+    """
+    # Handle PDF path
+    if not pdf_path:
+        pdf_path = input("Enter the path to your transcript PDF: ")
+
+    if not os.path.isfile(pdf_path):
+        print(f"Error: File '{pdf_path}' not found.")
+        return None
 
     # Extract text from PDF
-    transcript_content = extract_text_from_pdf(pdf_filename)
+    transcript_content = extract_text_from_pdf(pdf_path)
 
-    if transcript_content:
-        # Extract course data
-        course_data = extract_course_data(transcript_content)
-
-        print(f"Number of courses extracted: {len(course_data)}")
-
-        if course_data:
-            # Generate CSV filename based on input PDF name
-            base_name = os.path.splitext(os.path.basename(pdf_filename))[0]
-            timestamp = datetime.now().strftime("%Y%m%d")
-            csv_filename = f"{base_name}_grades_{timestamp}.csv"
-            write_to_csv(course_data, csv_filename)
-            print(f"CSV file '{csv_filename}' has been created successfully.")
-
-            print("\nPreview of extracted data:")
-            print(f"{'Semester':<10} {'Course':<12} {'Grade':<5} {'Mark':<5} {'Units':<5}")
-            print("-" * 50)
-            for row in course_data[:5]:  # Show first 5 courses
-                sem, code, grade, mark, units = row
-                print(f"{sem:<10} {code:<12} {grade:<5} {mark:<5} {units:<5}")
-
-            if len(course_data) > 5:
-                print(f"... and {len(course_data) - 5} more courses")
-        else:
-            print("No course data was extracted. The PDF content might not match the expected format.")
-    else:
+    if not transcript_content:
         print("Failed to extract text from the PDF.")
+        return None
+
+    # Extract course data
+    course_data = extract_course_data(transcript_content)
+
+    print(f"Number of courses extracted: {len(course_data)}")
+
+    if not course_data:
+        print("No course data was extracted. The PDF content might not match the expected format.")
+        return None
+
+    # Generate CSV filename if not provided
+    if not output_csv:
+        base_name = os.path.splitext(os.path.basename(pdf_path))[0]
+        timestamp = datetime.now().strftime("%Y%m%d")
+        output_csv = f"{base_name}_grades_{timestamp}.csv"
+
+    # Write to CSV
+    csv_path = write_to_csv(course_data, output_csv)
+    print(f"CSV file '{csv_path}' has been created successfully.")
+
+    # Show preview
+    print("\nPreview of extracted data:")
+    print(f"{'Semester':<10} {'Course':<12} {'Grade':<5} {'Mark':<5} {'Units':<5}")
+    print("-" * 70)
+    for row in course_data[:5]:  # Show first 5 courses
+        sem, code, grade, mark, units = row
+        print(f"{sem:<10} {code:<12} {grade:<5} {mark:<5} {units:<5}")
+
+    if len(course_data) > 5:
+        print(f"... and {len(course_data) - 5} more courses")
+
+    return output_csv
 
 
 if __name__ == "__main__":
-    main()
+    # If run directly as a script, process command line arguments
+    if len(sys.argv) > 1:
+        pdf_filename = sys.argv[1]
+        # Accept optional output filename as second argument
+        output_csv = sys.argv[2] if len(sys.argv) > 2 else None
+        process_transcript(pdf_filename, output_csv)
+    else:
+        process_transcript()
