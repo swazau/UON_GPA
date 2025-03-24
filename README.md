@@ -13,15 +13,13 @@
   <a href="https://makeapullrequest.com"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome"></a>
 </p>
 
-# Transcript Analysis Dashboard
-
 A Python tool for visualising academic performance and calculating GPAs and WAMs from PDF transcripts (both official and unofficial), designed for the University of Newcastle grading system.
 
 ## Features
 
 ### Interactive Web Interface
-- 🚀 Upload and analyze your transcripts through a user-friendly Streamlit interface
-- 📊 View all visualizations in one place
+- 🚀 Upload and analyse your transcripts through a user-friendly Streamlit interface
+- 📊 View all visualisations in one place
 - 📄 Process UON transcripts directly from PDF files
 - 📱 Mobile-friendly design
 
@@ -51,6 +49,10 @@ The Honours WAM (used for determining honours classification) is calculated usin
 - 4000/5000/6000 level courses: Weight = 4
 
 ## Screenshots
+
+### Dashboard
+![Streamlit](screenshots/streamlit_dashboard.png)
+
 
 ### GPA Trend
 ![GPA Trend Visualisation](screenshots/gpa_trend.png)
@@ -125,8 +127,8 @@ The web application will automatically open in your default browser. If it doesn
 ### Using the Dashboard
 1. Upload your PDF transcript using the file uploader
 2. The app will automatically process your transcript and display:
-   - GPA calculations and visualizations
-   - WAM calculations and visualizations
+   - GPA calculations and visualisations
+   - WAM calculations and visualisations
    - Course performance details
 
 ## Grade Scales
