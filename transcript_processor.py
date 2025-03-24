@@ -53,14 +53,14 @@ def extract_course_data(transcript):
 
         dept = course_match.group(1)
         code = course_match.group(2)
-        course_code = f"{dept} {code}"
+        course_code = f"{dept}{code}"
 
         # Skip "Enrolled" courses
         if "Enrolled" in line:
             continue
 
         # Special case for COMP 3851A - should not have a grade
-        if course_code == "COMP 3851A":
+        if course_code == "COMP3851A":
             course_data.append([current_semester, course_code, "NA", "", ""])
             continue
 

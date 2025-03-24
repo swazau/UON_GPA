@@ -1,6 +1,21 @@
-# GPA and WAM Calculator
 
-A Python tool for visualising academic performance and calculating GPAs and WAMs from CSV grade data or PDF transcripts, designed for the University of Newcastle grading system.
+<p align="center">
+  <img src="screenshots/logo-wamgpt.png" alt="GPA Trend Visualisation" width="150">
+</p>
+
+<p align="center">
+  <a href="https://github.com/swazau/UON_GPA/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
+  <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.8+-blue.svg" alt="Python version"></a>
+  <a href="https://github.com/swazau/UON_GPA/blob/main/CONTRIBUTING.md"><img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg" alt="Contributions welcome"></a>
+  <br>
+  <a href="https://github.com/swazau/UON_GPA/stargazers"><img src="https://img.shields.io/github/stars/swazau/UON_GPA.svg?style=social&label=Star" alt="GitHub stars"></a>
+  <a href="https://github.com/swazau/UON_GPA/network/members"><img src="https://img.shields.io/github/forks/swazau/UON_GPA.svg?style=social&label=Fork" alt="GitHub forks"></a>
+  <a href="https://github.com/swazau/UON_GPA/issues"><img src="https://img.shields.io/github/issues/swazau/UON_GPA.svg" alt="GitHub issues"></a>
+  <a href="https://makeapullrequest.com"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome"></a>
+</p>
+A Python tool for visualising academic performance and calculating GPAs and WAMs from PDF transcripts (both official and unofficial), designed for the University of Newcastle grading system.
+
+
 
 ## Features
 
@@ -95,7 +110,9 @@ pip install -r requirements.txt
 
 ## Usage
 
+
 streamlit run app.py
+
 
 
 ### Output
