@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Dict, Optional
 import os
 import argparse
-
+import plotly.express as px
 
 class GPAVisualiser:
     def __init__(self):
@@ -76,65 +76,40 @@ class GPAVisualiser:
             'gpa': gpa
         }
 
-    def plot_grade_distribution(self, df: pd.DataFrame, output_path: Optional[str] = 'grade_distribution.png') -> None:
-        """Create a pie chart of grade distribution by units"""
-        plt.figure(figsize=(10, 6))
+    def plot_grade_distribution(self, df: pd.DataFrame) -> 'plotly.graph_objs.Figure':
         valid_grades = df[df['grade'].isin(self.grade_points.keys())]
-        grade_units = valid_grades.groupby('grade')['units'].sum()
+        grade_units = valid_grades.groupby('grade')['units'].sum().reset_index()
+        fig = px.pie(grade_units, values='units', names='grade', title='Grade Distribution (by Units)',
+                    color_discrete_sequence=px.colors.qualitative.Set2)
+        return fig
 
-        colors = sns.color_palette("Set2", len(grade_units))
-        plt.pie(grade_units.values, labels=grade_units.index, autopct='%1.1f%%',
-                colors=colors)
-        plt.title('Grade Distribution (by Units)')
-        plt.savefig(output_path, bbox_inches='tight', dpi=300)
-        plt.close()
-
-    def plot_mark_distribution(self, df: pd.DataFrame, output_path: Optional[str] = 'mark_distribution.png') -> None:
-        """Create a histogram of numerical marks"""
-        plt.figure(figsize=(10, 6))
+    def plot_mark_distribution(self, df: pd.DataFrame) -> 'plotly.graph_objs.Figure':
         valid_marks = df[df['mark'].notna()]['mark']
+        fig = px.histogram(valid_marks, nbins=10, title='Distribution of Numerical Marks')
+        fig.update_traces(marker_color=px.colors.qualitative.Set2[2])
+        mean_mark = valid_marks.mean()
+        fig.add_vline(x=mean_mark, line_dash="dash", line_color="red",
+                    annotation_text=f"Mean: {mean_mark:.1f}", annotation_position="top right")
+        fig.update_layout(xaxis_title='Mark', yaxis_title='Count')
+        return fig
 
-        sns.histplot(data=valid_marks, bins=10, kde=True, color=sns.color_palette("husl")[2])
-        plt.axvline(valid_marks.mean(), color='red', linestyle='--',
-                    label=f'Mean: {valid_marks.mean():.1f}')
-
-        plt.title('Distribution of Numerical Marks')
-        plt.xlabel('Mark')
-        plt.ylabel('Count')
-        plt.legend()
-        plt.grid(True, alpha=0.3)
-        plt.savefig(output_path, bbox_inches='tight', dpi=300)
-        plt.close()
-
-    def plot_course_performance(self, df: pd.DataFrame, output_path: Optional[str] = 'course_performance.png') -> None:
-        """Create a horizontal bar chart of performance by course"""
-        plt.figure(figsize=(12, 8))
+    def plot_course_performance(self, df: pd.DataFrame) -> 'plotly.graph_objs.Figure':
         valid_courses = df[df['mark'].notna()].sort_values('mark', ascending=True)
-
-        colors = {
-            'HD': sns.color_palette("Set2")[0],
-            'D': sns.color_palette("Set2")[1],
-            'C': sns.color_palette("Set2")[2],
-            'P': sns.color_palette("Set2")[3],
-            'F': sns.color_palette("Set2")[4]
+        color_map = {
+            'HD': px.colors.qualitative.Set2[0],
+            'D': px.colors.qualitative.Set2[1],
+            'C': px.colors.qualitative.Set2[2],
+            'P': px.colors.qualitative.Set2[3],
+            'F': px.colors.qualitative.Set2[4]
         }
-
-        bars = plt.barh(valid_courses['course_code'], valid_courses['mark'])
-
-        for bar, grade in zip(bars, valid_courses['grade']):
-            if grade in colors:
-                bar.set_color(colors[grade])
-
-        plt.axvline(valid_courses['mark'].mean(), color='red', linestyle='--',
-                    label=f'Mean: {valid_courses["mark"].mean():.1f}')
-
-        plt.title('Performance by Course')
-        plt.xlabel('Mark')
-        plt.grid(True, alpha=0.3)
-        plt.legend()
-        plt.tight_layout()
-        plt.savefig(output_path, bbox_inches='tight', dpi=300)
-        plt.close()
+        fig = px.bar(valid_courses, y='course_code', x='mark', orientation='h',
+                    color='grade', color_discrete_map=color_map,
+                    title='Performance by Course')
+        mean_mark = valid_courses['mark'].mean()
+        fig.add_vline(x=mean_mark, line_dash="dash", line_color="red",
+                    annotation_text=f"Mean: {mean_mark:.1f}", annotation_position="top left")
+        fig.update_layout(xaxis_title='Mark', yaxis_title='Course Code')
+        return fig
 
     def calculate_semester_gpa(self, df: pd.DataFrame) -> pd.DataFrame:
         """
@@ -183,66 +158,17 @@ class GPAVisualiser:
 
         return pd.DataFrame(semester_gpa)
 
-    def plot_gpa_trend(self, df: pd.DataFrame, output_path: Optional[str] = 'gpa_trend.png') -> None:
-        """
-        Create a line plot showing GPA trend across semesters
-
-        Parameters:
-        df (pd.DataFrame): DataFrame containing grade data
-        output_path (str, optional): Path to save the plot. Defaults to 'gpa_trend.png'.
-        """
-        # Calculate GPA for each semester
+    def plot_gpa_trend(self, df: pd.DataFrame) -> 'plotly.graph_objs.Figure':
         semester_gpa = self.calculate_semester_gpa(df)
-
-        # Create the figure
-        plt.figure(figsize=(12, 6))
-
-        # Plot the GPA trend line
-        sns.lineplot(
-            x='semester',
-            y='gpa',
-            data=semester_gpa,
-            marker='o',
-            markersize=10,
-            linewidth=2,
-            color=sns.color_palette("husl")[0]
-        )
-
-        # Calculate and plot cumulative GPA
-        cumulative_points = 0
-        cumulative_units = 0
-        cumulative_gpa = []
-
-        for _, row in semester_gpa.iterrows():
-            cumulative_units += row['units']
-            cumulative_points += row['gpa'] * row['units']
-            if cumulative_units > 0:
-                cumulative_gpa.append(round(cumulative_points / cumulative_units, 2))
-            else:
-                cumulative_gpa.append(0)
-
-        plt.plot(
-            range(len(semester_gpa)),
-            cumulative_gpa,
-            linestyle='--',
-            marker='s',
-            markersize=8,
-            color=sns.color_palette("husl")[1],
-            label='Cumulative GPA'
-        )
-
-        # Set plot properties
-        plt.title('GPA Trend by Semester', fontsize=16)
-        plt.xlabel('Semester', fontsize=12)
-        plt.ylabel('GPA', fontsize=12)
-        plt.grid(True, alpha=0.3)
-        plt.ylim(0, 7.5)  # Setting y-axis range based on the 7-point GPA scale
-        plt.tight_layout()
-        plt.legend(['Semester GPA', 'Cumulative GPA'])
-
-        # Save the figure
-        plt.savefig(output_path, bbox_inches='tight', dpi=300)
-        plt.close()
+        fig = px.line(semester_gpa, x='semester', y='gpa', markers=True, title='GPA Trend by Semester')
+        fig.update_traces(line_color=px.colors.qualitative.Set2[0], marker_size=10)
+        # Assume cumulative_gpa is calculated as a list or Series
+        cumulative_gpa = semester_gpa['gpa'].cumsum() / (semester_gpa.index + 1)  # Example calculation
+        fig.add_scatter(x=semester_gpa['semester'], y=cumulative_gpa, mode='lines+markers',
+                        line_dash='dash', marker_symbol='square', marker_size=8,
+                        line_color=px.colors.qualitative.Set2[1], name='Cumulative GPA')
+        fig.update_layout(yaxis_range=[0, 7.5], xaxis_title='Semester', yaxis_title='GPA')
+        return fig
 
 
 def ensure_dir(directory):
