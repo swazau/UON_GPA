@@ -1,4 +1,3 @@
-
 <p align="center">
   <img src="screenshots/logo-wamgpt.png" alt="GPA Trend Visualisation" width="150">
 </p>
@@ -13,11 +12,18 @@
   <a href="https://github.com/swazau/UON_GPA/issues"><img src="https://img.shields.io/github/issues/swazau/UON_GPA.svg" alt="GitHub issues"></a>
   <a href="https://makeapullrequest.com"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome"></a>
 </p>
+
+# Transcript Analysis Dashboard
+
 A Python tool for visualising academic performance and calculating GPAs and WAMs from PDF transcripts (both official and unofficial), designed for the University of Newcastle grading system.
 
-
-
 ## Features
+
+### Interactive Web Interface
+- 🚀 Upload and analyze your transcripts through a user-friendly Streamlit interface
+- 📊 View all visualizations in one place
+- 📄 Process UON transcripts directly from PDF files
+- 📱 Mobile-friendly design
 
 ### GPA Calculator
 - 📊 Calculate overall GPA using a 7-point scale
@@ -25,7 +31,6 @@ A Python tool for visualising academic performance and calculating GPAs and WAMs
 - 🥧 Generate grade distribution charts
 - 📉 Analyse mark distributions
 - 📋 View detailed course performance breakdowns
-- 📄 Process UON transcripts directly from PDF files
 
 ### WAM Calculator
 - 🎓 Calculate Honours WAM by default (2000+ level courses)
@@ -35,7 +40,6 @@ A Python tool for visualising academic performance and calculating GPAs and WAMs
 - 📈 Track WAM trends across semesters
 - 📉 View mark distribution with WAM thresholds
 - 📋 See detailed course-by-course breakdown
-- 📄 Process UON transcripts directly from PDF files
 
 ## What is WAM?
 
@@ -45,7 +49,6 @@ The Honours WAM (used for determining honours classification) is calculated usin
 - 2000 level courses: Weight = 2
 - 3000 level courses: Weight = 3
 - 4000/5000/6000 level courses: Weight = 4
-
 
 ## Screenshots
 
@@ -108,33 +111,23 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Usage
+## Running the Application
 
+To run the interactive Streamlit dashboard:
 
+```bash
+# Make sure your virtual environment is activated
 streamlit run app.py
+```
 
+The web application will automatically open in your default browser. If it doesn't, you can access it at http://localhost:8501.
 
-
-### Output
-
-#### GPA Program Output
-The program generates:
-1. Detailed GPA calculations in the console
-2. Four visualisation files:
-   - `grade_distribution`: Pie chart showing grade distribution by units
-   - `mark_distribution`: Histogram of numerical marks
-   - `course_performance`: Bar chart of performance by course
-   - `gpa_trend`: Line chart showing semester and cumulative GPA trends
-
-#### WAM Program Output
-The program generates:
-1. Honours WAM calculation (2000+ level courses) prominently displayed
-2. Additional WAM calculations for reference in the console
-3. Three visualisation files:
-   - `wam_comparison`: Bar chart comparing different WAM calculations
-   - `wam_mark_distribution`: Histogram with WAM thresholds
-   - `wam_trend`: Line chart showing semester and cumulative WAM trends
-   - `honours_threshold`: The Honours Thresholds graph is a custom horizontal bar chart that visually displays where your calculated WAM
+### Using the Dashboard
+1. Upload your PDF transcript using the file uploader
+2. The app will automatically process your transcript and display:
+   - GPA calculations and visualizations
+   - WAM calculations and visualizations
+   - Course performance details
 
 ## Grade Scales
 
@@ -155,10 +148,6 @@ The program generates:
 | F | 0-44 | Fixed value of 44 |
 | UP | N/A | Fixed value of 58 |
 
-## Customisation
-
-You can modify the grade points in the `GPAVisualiser` class initialisation if your institution uses a different scale.
-
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
@@ -170,5 +159,8 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Acknowledgments
 - [University of Newcastle GPA Calculator](https://www.newcastle.edu.au/current-students/study-essentials/assessment-and-exams/results/gpa-calculator)
 - [University of Newcastle WAM Calculation Guideline](https://policies.newcastle.edu.au/document/view-current.php?id=3)
+- [DataCraftsmanAU](https://github.com/DataCraftsmanAU) for the Streamlit interface
 - [Pandas](https://pandas.pydata.org/) for data manipulation
-- [Matplotlib](https://matplotlib.org/) and [Seaborn](https://seaborn.pydata.org/) for visualisation
+- [Plotly](https://plotly.com/) for interactive visualisations
+- [Streamlit](https://streamlit.io/) for the web interface
+- [PDFPlumber](https://github.com/jsvine/pdfplumber) for PDF processing
