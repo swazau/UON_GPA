@@ -47,7 +47,7 @@ if 'error_message' not in st.session_state:
 uploaded_file = st.file_uploader(
     "Upload your PDF transcript",
     type="pdf",
-    help="Only official University of Newcastle PDF transcripts are supported"
+    help="Only University of Newcastle PDF transcripts are supported"
 )
 
 
@@ -69,7 +69,7 @@ def process_and_analyse():
             csv_path = process_transcript(pdf_path)
         except Exception as e:
             logger.error(f"Transcript processing error: {str(e)}")
-            st.session_state.error_message = "Failed to process transcript. Please ensure you're uploading an official UoN transcript."
+            st.session_state.error_message = "Failed to process transcript. Please ensure you're uploading an UON transcript."
             return
 
         if not csv_path or not os.path.exists(csv_path):
@@ -222,17 +222,15 @@ if st.session_state.get('processing_complete', False):
 else:
     # Show sample images if no file uploaded
     if not uploaded_file:
-        st.info("Please upload a PDF transcript to begin analysis.")
+        st.info("Please upload a PDF transcript to begin analysis. [How to Get Your Transcript](/How_to_Get_Your_Transcript)")
 
         # Initialise session state for showing samples if not already set
         if 'show_samples' not in st.session_state:
             st.session_state.show_samples = False
 
-
         # Function to toggle sample visibility
         def toggle_samples():
             st.session_state.show_samples = not st.session_state.show_samples
-
 
         # Toggle button for samples with the correct label based on current state
         button_label = "Minimise Samples" if st.session_state.show_samples else "View Sample Visualisations"
@@ -289,9 +287,13 @@ with st.sidebar:
 
     st.header("Created By")
     st.write("Daniel Ferguson")
-    st.markdown('<a href="https://github.com/swazau" target="_blank"><img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="20"> GitHub</a>', unsafe_allow_html=True)
+    st.markdown(
+        '<a href="https://github.com/swazau" target="_blank"><img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="20"> GitHub</a>',
+        unsafe_allow_html=True)
     st.write("DataCraftsmanAU")
-    st.markdown('<a href="https://github.com/DataCraftsmanAU" target="_blank"><img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="20"> GitHub</a>', unsafe_allow_html=True)
+    st.markdown(
+        '<a href="https://github.com/DataCraftsmanAU" target="_blank"><img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" width="20"> GitHub</a>',
+        unsafe_allow_html=True)
 
 # Add a footer
 st.markdown("---")

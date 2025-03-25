@@ -119,7 +119,7 @@ To run the interactive Streamlit dashboard:
 
 ```bash
 # Make sure your virtual environment is activated
-streamlit run app.py
+streamlit run Dashboard.py
 ```
 
 The web application will automatically open in your default browser. If it doesn't, you can access it at http://localhost:8501.
