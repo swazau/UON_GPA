@@ -7,6 +7,7 @@ import os
 import argparse
 import plotly.express as px
 
+
 class GPAVisualiser:
     def __init__(self):
         self.grade_points = {
@@ -80,7 +81,7 @@ class GPAVisualiser:
         valid_grades = df[df['grade'].isin(self.grade_points.keys())]
         grade_units = valid_grades.groupby('grade')['units'].sum().reset_index()
         fig = px.pie(grade_units, values='units', names='grade', title='Grade Distribution (by Units)',
-                    color_discrete_sequence=px.colors.qualitative.Set2)
+                     color_discrete_sequence=px.colors.qualitative.Set2)
         return fig
 
     def plot_mark_distribution(self, df: pd.DataFrame) -> 'plotly.graph_objs.Figure':
@@ -89,7 +90,7 @@ class GPAVisualiser:
         fig.update_traces(marker_color=px.colors.qualitative.Set2[2])
         mean_mark = valid_marks.mean()
         fig.add_vline(x=mean_mark, line_dash="dash", line_color="red",
-                    annotation_text=f"Mean: {mean_mark:.1f}", annotation_position="top right")
+                      annotation_text=f"Mean: {mean_mark:.1f}", annotation_position="top right")
         fig.update_layout(xaxis_title='Mark', yaxis_title='Count')
         return fig
 
@@ -103,12 +104,12 @@ class GPAVisualiser:
             'F': px.colors.qualitative.Set2[4]
         }
         fig = px.bar(valid_courses, y='course_code', x='mark', orientation='h',
-                    color='grade', color_discrete_map=color_map,
-                    title='Performance by Course')
+                     color='grade', color_discrete_map=color_map,
+                     title='Performance by Course')
         mean_mark = valid_courses['mark'].mean()
         fig.add_vline(x=mean_mark, line_dash="dash", line_color="red",
-                    annotation_text=f"Mean: {mean_mark:.1f}", annotation_position="top left")
-        fig.update_layout(height=500, xaxis_title='Mark', yaxis_title='Course Code')
+                      annotation_text=f"Mean: {mean_mark:.1f}", annotation_position="top left")
+        fig.update_layout(height=700, xaxis_title='Mark', yaxis_title='Course Code')
         return fig
 
     def calculate_semester_gpa(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -221,7 +222,6 @@ def main():
         print(f"Error loading CSV: {e}")
         print("Falling back to built-in data.")
         df = visualiser.create_grade_data()
-
 
     # Get the CSV file path from command line arguments or use the default
     # import sys
