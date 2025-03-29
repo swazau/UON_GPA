@@ -108,7 +108,7 @@ class GPAVisualiser:
         mean_mark = valid_courses['mark'].mean()
         fig.add_vline(x=mean_mark, line_dash="dash", line_color="red",
                     annotation_text=f"Mean: {mean_mark:.1f}", annotation_position="top left")
-        fig.update_layout(xaxis_title='Mark', yaxis_title='Course Code')
+        fig.update_layout(height=500, xaxis_title='Mark', yaxis_title='Course Code')
         return fig
 
     def calculate_semester_gpa(self, df: pd.DataFrame) -> pd.DataFrame:
