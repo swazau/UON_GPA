@@ -5,7 +5,8 @@ from pathlib import Path
 from typing import Dict, Optional
 import os
 import argparse
-
+import plotly.express as px
+import plotly.graph_objects as go
 
 class WAMCalculator:
     def __init__(self):
@@ -281,249 +282,186 @@ class WAMCalculator:
 
         return pd.DataFrame(semester_wam)
 
-    def plot_wam_trend(self, df: pd.DataFrame, output_path: str = 'wam_trend.png') -> None:
+    def plot_wam_trend(self, df: pd.DataFrame) -> 'plotly.graph_objs.Figure':
         """
-        Create a line plot showing WAM trend across semesters
-
-        Parameters:
-        df (pd.DataFrame): DataFrame containing grade data
-        output_path (str): Path to save the plot
+        Create an interactive line plot showing WAM trend across semesters.
+        
+        Args:
+            df: DataFrame with columns 'semester', 'course_code', 'mark', 'grade', 'units'.
+        
+        Returns:
+            plotly.graph_objs.Figure: Plotly figure object for the WAM trend.
         """
-        # Calculate WAM for each semester
+        # Assume calculate_semester_wam returns a DataFrame with 'semester', 'wam', 'units'
         semester_wam = self.calculate_semester_wam(df)
+        fig = go.Figure()
 
-        # Create the figure
-        plt.figure(figsize=(12, 6))
+        # Plot Semester WAM
+        fig.add_trace(go.Scatter(
+            x=semester_wam['semester'],
+            y=semester_wam['wam'],
+            mode='lines+markers',
+            name='Semester WAM',
+            marker=dict(size=10, color=px.colors.qualitative.Set2[0]),
+            line=dict(color=px.colors.qualitative.Set2[0])
+        ))
 
-        # Plot the WAM trend line
-        sns.lineplot(
-            x='semester',
-            y='wam',
-            data=semester_wam,
-            marker='o',
-            markersize=10,
-            linewidth=2,
-            color=sns.color_palette("husl")[0]
-        )
+        # Compute Cumulative WAM
+        df_wam = df.copy()
+        df_wam['course_level'] = df_wam['course_code'].str.extract(r'([0-9])')[0].astype(int) * 1000
+        level_weights = {1000: 1, 2000: 2, 3000: 3, 4000: 4, 5000: 4, 6000: 4}
+        df_wam['weight'] = df_wam['course_level'].map(level_weights).fillna(1)
+        
+        # Transform grades and marks according to WAM rules
+        def map_mark_for_wam(row):
+            # For UP (ungraded pass) use 58 as the mark value
+            if row['grade'] == 'UP':
+                return 58
 
-        # Calculate and plot cumulative WAM
+            # For passing grades (P, C, D, HD), use the actual mark
+            if row['grade'] in ['P', 'C', 'D', 'HD']:
+                return row['mark']
+
+            # For failing grades (45-49), use the actual mark
+            if row['grade'] == 'F' and 45 <= row['mark'] <= 49:
+                return row['mark']
+
+            # For failing grades (0-44), use 44
+            if row['grade'] == 'F' and row['mark'] < 45:
+                return 44
+
+            # Default case
+            return row['mark']
+        
+        df_wam['wam_mark'] = df_wam.apply(map_mark_for_wam, axis=1)
+        df_wam = df_wam.sort_values('semester')
+
         cumulative_points = 0
-        cumulative_units = 0
         cumulative_weighted_units = 0
         cumulative_wam = []
 
-        # Make a copy of the dataframe for cumulative calculations
-        df_cum = df.copy()
-        df_cum['course_level'] = df_cum['course_code'].str.extract(r'([0-9])')[0].astype(int) * 1000
-        df_cum['weight'] = df_cum['course_level'].apply(
-            lambda x: {1000: 1, 2000: 2, 3000: 3, 4000: 4, 5000: 4, 6000: 4}.get(x, 1))
+        for semester in semester_wam['semester']:
+            semester_data = df_wam[df_wam['semester'] == semester]
+            semester_points = (semester_data['wam_mark'] * semester_data['units'] * semester_data['weight']).sum()
+            semester_weighted_units = (semester_data['units'] * semester_data['weight']).sum()
+            cumulative_points += semester_points
+            cumulative_weighted_units += semester_weighted_units
+            cumulative_wam.append(cumulative_points / cumulative_weighted_units if cumulative_weighted_units > 0 else 0)
 
-        # Function to calculate WAM mark
-        def get_wam_mark(row):
-            if row['grade'] == 'UP':
-                return 58
-            if row['grade'] in ['P', 'C', 'D', 'HD']:
-                return row['mark']
-            if row['grade'] == 'F' and 45 <= row['mark'] <= 49:
-                return row['mark']
-            if row['grade'] == 'F' and row['mark'] < 45:
-                return 44
-            return row['mark']
+        # Plot Cumulative WAM
+        fig.add_trace(go.Scatter(
+            x=semester_wam['semester'],
+            y=cumulative_wam,
+            mode='lines+markers',
+            name='Cumulative WAM',
+            marker=dict(size=8, symbol='square', color=px.colors.qualitative.Set2[1]),
+            line=dict(dash='dash', color=px.colors.qualitative.Set2[1])
+        ))
 
-        df_cum['wam_mark'] = df_cum.apply(get_wam_mark, axis=1)
-
-        semesters = sorted(df_cum['semester'].unique())
-        for i, semester in enumerate(semesters):
-            # Get all data up to and including current semester
-            current_data = df_cum[df_cum['semester'].apply(lambda x: x in semesters[:i + 1])]
-
-            # Calculate cumulative WAM
-            weighted_marks = current_data['wam_mark'] * current_data['units'] * current_data['weight']
-            weighted_units = current_data['units'] * current_data['weight']
-
-            cum_wam = weighted_marks.sum() / weighted_units.sum() if weighted_units.sum() > 0 else 0
-            cumulative_wam.append(round(cum_wam, 2))
-
-        # Plot cumulative WAM
-        plt.plot(
-            range(len(semester_wam)),
-            cumulative_wam,
-            linestyle='--',
-            marker='s',
-            markersize=8,
-            color=sns.color_palette("husl")[1],
-            label='Cumulative WAM'
+        # Update layout
+        fig.update_layout(
+            title='WAM Trend by Semester',
+            xaxis_title='Semester',
+            yaxis_title='WAM',
+            yaxis_range=[0, 100],
+            legend=dict(yanchor="top", y=0.99, xanchor="left", x=0.01)
         )
+        return fig
 
-        # Set plot properties
-        plt.title('WAM Trend by Semester', fontsize=16)
-        plt.xlabel('Semester', fontsize=12)
-        plt.ylabel('WAM', fontsize=12)
-        plt.grid(True, alpha=0.3)
-        plt.ylim(0, 100)  # Setting y-axis range based on mark scale
-        plt.tight_layout()
-        plt.legend(['Semester WAM', 'Cumulative WAM'])
-
-        # Save the figure
-        plt.savefig(output_path, bbox_inches='tight', dpi=300)
-        plt.close()
-
-    def plot_wam_comparison(self, df: pd.DataFrame, output_path: str = 'wam_comparison.png') -> None:
+    def plot_wam_comparison(self, df: pd.DataFrame) -> 'plotly.graph_objs.Figure':
         """
-        Create a bar chart comparing WAM calculations with different criteria,
-        highlighting the Honours WAM (2000+ level courses)
-
-        Parameters:
-        df (pd.DataFrame): DataFrame containing grade data
-        output_path (str): Path to save the plot
+        Create an interactive bar chart comparing different WAM calculations.
+        
+        Args:
+            df: DataFrame with course data.
+        
+        Returns:
+            plotly.graph_objs.Figure: Plotly figure object for WAM comparison.
         """
-        # Calculate different types of WAM
+        # Assume calculate_wam returns a dict with 'raw_wam' key
         wam_all = self.calculate_wam(df, 'cumulative')
-        wam_2000_plus = self.calculate_wam(df, 'level', 2000)  # Honours WAM
+        wam_2000_plus = self.calculate_wam(df, 'level', 2000)
         wam_3000_plus = self.calculate_wam(df, 'level', 3000)
 
-        # Create comparison data
-        wam_types = ['Cumulative', '2000+ Level\n(Honours WAM)', '3000+ Level']
-        wam_values = [wam_all['raw_wam'], wam_2000_plus['raw_wam'], wam_3000_plus['raw_wam']]
+        df_comparison = pd.DataFrame({
+            'Type': ['Cumulative', '2000+ Level (Honours WAM)', '3000+ Level'],
+            'WAM': [wam_all['raw_wam'], wam_2000_plus['raw_wam'], wam_3000_plus['raw_wam']]
+        })
 
-        # Create color palette with emphasis on Honours WAM
-        colors = [sns.color_palette("husl")[2],
-                  sns.color_palette("husl")[0],  # Highlight color for Honours WAM
-                  sns.color_palette("husl")[2]]
+        fig = px.bar(df_comparison, x='Type', y='WAM', color='Type',
+                     color_discrete_sequence=px.colors.qualitative.Set2,
+                     title='WAM Comparison by Course Level Inclusion')
+        fig.update_layout(yaxis_range=[0, 100], showlegend=False)
+        return fig
 
-        # Create plot
-        plt.figure(figsize=(10, 6))
-        bars = plt.bar(wam_types, wam_values, color=colors)
-
-        # Add value labels on top of bars
-        for bar in bars:
-            height = bar.get_height()
-            plt.text(bar.get_x() + bar.get_width() / 2., height + 0.5,
-                     f'{height:.2f}', ha='center', va='bottom')
-
-        # Highlight the Honours WAM bar
-        plt.text(1, wam_2000_plus['raw_wam'] / 2, "HONOURS",
-                 ha='center', va='center', color='white',
-                 fontweight='bold', rotation=90)
-
-        plt.title('WAM Comparison by Course Level Inclusion')
-        plt.ylabel('Weighted Average Mark')
-        plt.ylim(0, 100)  # Set y-axis to mark scale
-        plt.grid(axis='y', linestyle='--', alpha=0.7)
-        plt.savefig(output_path, bbox_inches='tight', dpi=300)
-        plt.close()
-
-    def plot_mark_distribution(self, df: pd.DataFrame, output_path: str = 'wam_mark_distribution.png') -> None:
-        """Create a histogram of numerical marks with WAM thresholds"""
-        plt.figure(figsize=(10, 6))
+    def plot_mark_distribution(self, df: pd.DataFrame) -> 'plotly.graph_objs.Figure':
+        """
+        Create an interactive histogram of numerical marks with thresholds.
+        
+        Args:
+            df: DataFrame with 'mark' column.
+        
+        Returns:
+            plotly.graph_objs.Figure: Plotly figure object for mark distribution.
+        """
         valid_marks = df[df['mark'].notna()]['mark']
+        fig = px.histogram(valid_marks, nbins=10, title='Distribution of Marks with Honours Class Thresholds')
+        fig.update_traces(marker_color=px.colors.qualitative.Set2[2])
 
-        # Plot histogram
-        sns.histplot(data=valid_marks, bins=10, kde=True, color=sns.color_palette("husl")[2])
+        mean_mark = valid_marks.mean()
+        fig.add_vline(x=mean_mark, line_dash='dash', line_color='red',
+                      annotation_text=f'Mean: {mean_mark:.1f}', annotation_position='top right')
 
-        # Add mean line
-        plt.axvline(valid_marks.mean(), color='red', linestyle='--',
-                    label=f'Mean: {valid_marks.mean():.1f}')
+        # Add honours thresholds
+        thresholds = [67, 72, 77]
+        for threshold in thresholds:
+            fig.add_vline(x=threshold, line_dash='dot', line_color='gray')
 
-        # Add honors class thresholds
-        thresholds = {
-            'Class I (77+)': 77,
-            'Class II Div 1 (72-76)': 72,
-            'Class II Div 2 (67-71)': 67,
-            'Ungraded (<67)': 67
-        }
+        fig.update_layout(xaxis_title='Mark', yaxis_title='Count')
+        return fig
 
-        colors = ['darkgreen', 'green', 'orange', 'gray']
-        for i, (label, value) in enumerate(list(thresholds.items())[:-1]):
-            plt.axvline(value, color=colors[i], linestyle='-.',
-                        alpha=0.7, label=label)
-
-        plt.title('Distribution of Marks with Honours Class Thresholds')
-        plt.xlabel('Mark')
-        plt.ylabel('Count')
-        plt.legend()
-        plt.grid(True, alpha=0.3)
-        plt.savefig(output_path, bbox_inches='tight', dpi=300)
-        plt.close()
-
-    def plot_honours_thresholds(self, df: pd.DataFrame, output_path: str = 'honours_thresholds.png') -> None:
-
-        # Calculate Honours WAM (2000+ level courses)
+    def plot_honours_thresholds(self, df: pd.DataFrame) -> 'plotly.graph_objs.Figure':
+        """
+        Create an interactive chart showing honours classification thresholds.
+        
+        Args:
+            df: DataFrame with course data.
+        
+        Returns:
+            plotly.graph_objs.Figure: Plotly figure object for honours thresholds.
+        """
         honours_wam = self.calculate_wam(df, 'level', 2000)
-
-        plt.figure(figsize=(14, 8))
-
         thresholds = [
-            {'min': 77, 'max': 100, 'label': 'Class I', 'color': '#4CAF50'},  # Green
-            {'min': 72, 'max': 77, 'label': 'Class II Division 1', 'color': '#8BC34A'},  # Light Green
-            {'min': 67, 'max': 72, 'label': 'Class II Division 2', 'color': '#FFC107'},  # Amber
-            {'min': 60, 'max': 67, 'label': 'Ungraded', 'color': '#E0E0E0'}  # Light Grey
+            {'min': 77, 'max': 100, 'label': 'Class I', 'color': '#4CAF50'},
+            {'min': 72, 'max': 77, 'label': 'Class II Division 1', 'color': '#8BC34A'},
+            {'min': 67, 'max': 72, 'label': 'Class II Division 2', 'color': '#FFC107'},
+            {'min': 60, 'max': 67, 'label': 'Ungraded', 'color': '#E0E0E0'}
         ]
 
-        ax = plt.gca()
-        ax.add_patch(plt.Rectangle((60, 0.1), 40, 0.8, color='#F5F5F5', alpha=0.5, zorder=0))
-        y_pos = 0.5
-
+        fig = go.Figure()
         for threshold in thresholds:
-            plt.barh(y_pos, threshold['max'] - threshold['min'], left=threshold['min'],
-                     height=0.4, color=threshold['color'], alpha=0.9,
-                     edgecolor='white', linewidth=1, zorder=2)
+            fig.add_trace(go.Bar(
+                y=[threshold['label']],
+                x=[threshold['max'] - threshold['min']],
+                base=threshold['min'],
+                orientation='h',
+                marker_color=threshold['color'],
+                name=threshold['label']
+            ))
 
-        for threshold in thresholds:
-            mid_point = threshold['min'] + (threshold['max'] - threshold['min']) / 2
-            # Only add label if range is wide enough
-            if threshold['max'] - threshold['min'] > 5:
-                plt.text(mid_point, y_pos, threshold['label'],
-                         ha='center', va='center', color='white', fontweight='bold',
-                         fontsize=14, zorder=3)
+        fig.add_vline(x=honours_wam['raw_wam'], line_color='red', line_width=3,
+                      annotation_text=f"Your WAM: {honours_wam['raw_wam']:.2f}",
+                      annotation_position='top left')
 
-        line_color = '#E53935'  # Bright red
-        plt.axvline(x=honours_wam['raw_wam'], color=line_color, linestyle='-', linewidth=3, zorder=4)
-
-        text_box = plt.text(honours_wam['raw_wam'], 1.3,
-                            f"Your WAM: {honours_wam['raw_wam']:.2f}",
-                            ha='center', va='center', color='black', fontsize=16, fontweight='bold',
-                            bbox=dict(facecolor='white', edgecolor=line_color, alpha=0.95,
-                                      boxstyle='round,pad=0.6', linewidth=2), zorder=5)
-
-        arrow_props = dict(arrowstyle='->', color=line_color, linewidth=3, shrinkA=0, shrinkB=0)
-        plt.annotate('', xy=(honours_wam['raw_wam'], 0.7), xytext=(honours_wam['raw_wam'], 0.85),
-                     arrowprops=arrow_props, zorder=5)
-
-        # Set plot properties
-        plt.xlim(60, 100)  # Focus on the relevant range
-        plt.ylim(0, 2)  # Keep space for the labels
-
-        # Remove axes but keep bottom axis ticks for reference
-        ax.spines['top'].set_visible(False)
-        ax.spines['right'].set_visible(False)
-        ax.spines['left'].set_visible(False)
-        ax.get_yaxis().set_visible(False)
-
-        # Customise x-axis with cleaner tick marks
-        plt.xticks([67, 72, 77, 85, 90, 95, 100], fontsize=12)
-        ax.tick_params(axis='x', which='both', length=5, width=1, direction='out', pad=10)
-
-        # Add threshold labels below the axis with more spacing
-        threshold_labels = [
-            {'pos': 67, 'text': 'Class II Div 2\nThreshold'},
-            {'pos': 72, 'text': 'Class II Div 1\nThreshold'},
-            {'pos': 77, 'text': 'Class I\nThreshold'}
-        ]
-
-        for label in threshold_labels:
-            plt.annotate(label['text'], xy=(label['pos'], -0.1), xycoords=('data', 'axes fraction'),
-                         ha='center', va='top', fontsize=11,
-                         bbox=dict(boxstyle='round,pad=0.4', fc='#F5F5F5', ec='#CCCCCC', alpha=0.8))
-
-        # Add title with improved styling
-        plt.title('Honours Classification', fontsize=22, fontweight='bold', pad=20)
-
-        # Save the figure with tight layout
-        plt.tight_layout()
-        plt.savefig(output_path, bbox_inches='tight', dpi=300)
-        plt.close()
-
+        fig.update_layout(
+            title='Honours Classification',
+            xaxis_title='WAM',
+            yaxis_title='Honours Class',
+            barmode='stack',
+            showlegend=False,
+            xaxis_range=[60, 100]
+        )
+        return fig
 
 def ensure_dir(directory):
     if not os.path.exists(directory):
