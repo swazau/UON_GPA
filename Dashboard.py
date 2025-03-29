@@ -199,16 +199,15 @@ if st.session_state.get('processing_complete', False):
             """)
 
         with col2:
-            st.metric("Honours WAM", f"{wam_results['rounded_wam']}")
+            st.metric("Honours WAM (Embedded Honours)", f"{wam_results['rounded_wam']}")
             st.metric("Honours Class", wam_results['honours_class'])
 
-            # Add more context about WAM
             st.info("""
             **Honours Classes:**
-            - First Class: 80+
-            - Second Class, Division 1: 75-79
-            - Second Class, Division 2: 70-74
-            - Third Class: 65-69
+            - Class I: 77-100
+            - Class II Division 1: 72-76
+            - Class II Division 2: 67-71
+            - Ungraded: <67
             """)
 
         # Download option for results
