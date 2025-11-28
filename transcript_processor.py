@@ -59,13 +59,14 @@ def extract_course_data(transcript):
         if "Enrolled" in line:
             continue
 
-        # Special case for COMP 3851A - should not have a grade
-        if course_code == "COMP3851A":
+        # Split the line into parts
+        parts = re.split(r'\s+', line)
+
+        # Handle courses with no grade
+        if "NA" in parts:
             course_data.append([current_semester, course_code, "NA", "", ""])
             continue
 
-        # Split the line into parts
-        parts = re.split(r'\s+', line)
 
         # Look for grade
         grade = None
